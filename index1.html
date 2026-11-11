@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测一测，TA是不是也在偷偷喜欢你</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff789c',
+                        secondary: '#ffb6c8',
+                        soft: '#fff4f7'
+                    },
+                    fontFamily: {
+                        sans: ['system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .card-shadow{
+            box-shadow: 0 10px 30px rgba(255,120,156,0.15);
+        }
+        .option-item{
+            transition: all 0.2s ease;
+        }
+        .option-item:hover{
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,120,156,0.2);
+        }
+    </style>
+</head>
+<body class="bg-soft min-h-screen">
+    <div class="max-w-xl mx-auto px-4 py-8">
+        <!-- 首页 -->
+        <div id="page-home" class="block">
+            <div class="bg-white rounded-2xl p-8 card-shadow text-center">
+                <h1 class="text-[clamp(1.8rem,5vw,2.4rem)] font-bold text-primary mb-3">测一测，TA是不是也在偷偷喜欢你</h1>
+                <p class="text-gray-500 text-lg mb-6">凭你的心动细节，匹配 TA 的真实心意</p>
+                <div class="text-left space-y-3 my-8">
+                    <div class="flex items-center gap-2 text-gray-700">
+                        <i class="fa fa-check text-primary"></i>
+                        <span>心动细节｜每个举动都有答案</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-gray-700">
+                        <i class="fa fa-check text-primary"></i>
+                        <span>聊天温度｜回复速度藏着态度</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-gray-700">
+                        <i class="fa fa-check text-primary"></i>
+                        <span>暧昧浓度｜你们现在到哪一步</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-gray-700">
+                        <i class="fa fa-check text-primary"></i>
+                        <span>心意解读｜TA心里到底怎么看你</span>
+                    </div>
+                </div>
+                <button onclick="startTest()" class="w-full bg-primary hover:bg-pink-600 text-white py-4 rounded-full text-xl font-medium transition-all">
+                    点击测试 →
+                </button>
+                <p class="text-gray-400 mt-6 text-sm">趣味测试仅供娱乐，别拿结果去质问他</p>
+            </div>
+        </div>
+
+        <!-- 答题页面 -->
+        <div id="page-question" class="hidden">
+            <div class="bg-white rounded-2xl p-6 card-shadow">
+                <div class="flex justify-between items-center mb-4">
+                    <span id="q-index" class="text-primary font-medium">第1题 / 共32题</span>
+                    <span id="q-progress" class="text-gray-400">0%</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2 mb-6">
+                    <div id="progress-bar" class="bg-primary h-2 rounded-full" style="width:0%"></div>
+                </div>
+                <h2 id="q-title" class="text-lg font-medium text-gray-800 min-h-[60px]"></h2>
+                <div id="option-box" class="mt-6 space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- 结果页 -->
+        <div id="page-result" class="hidden">
+            <div class="bg-white rounded-2xl p-8 card-shadow text-center">
+                <div class="text-5xl mb-4">💌</div>
+                <h2 id="result-title" class="text-2xl font-bold text-primary mb-4"></h2>
+                <p id="result-desc" class="text-gray-600 leading-relaxed my-6 text-left"></p>
+                <button onclick="restart()" class="w-full bg-primary hover:bg-pink-600 text-white py-3 rounded-full mt-4">重新测试</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+// 标签映射
+const tagMap = {
+    A:"双向奔赴型",B:"偷偷暗恋型",C:"友达以上型",D:"慢热观望型",
+    E:"故作镇定型",F:"纯友谊型",G:"暧昧拉扯型",H:"礼貌友好型",
+    I:"信号错位型",J:"时机未到型"
+};
+// 结果文案
+const resultData = {
+"A":{title:"双向奔赴型 —— 你俩就差一个人先开口",desc:"双向心动实锤！两个人都在偷偷惦记对方，主动释放好感，互相在意，默契拉满。只差一个勇敢的契机，挑明之后大概率顺利在一起。"},
+"B":{title:"偷偷暗恋型 —— TA也喜欢你，只是不敢说",desc:"TA心里早就喜欢你了，但是胆子很小，害怕被拒绝、怕破坏现在的关系。所有小心翼翼的小动作，全是藏不住的喜欢，只是缺少勇气。"},
+"C":{title:"友达以上型 —— 再靠近一点就变味了",desc:"好感已经远超普通朋友，氛围甜甜的，彼此相处舒服，暧昧的种子已经发芽，只差一点点推力，就能跨过朋友这条线。"},
+"D":{title:"慢热观望型 —— 有感觉，但还在观察你",desc:"TA对你不反感，有好感，但是性格谨慎，不会快速动心。正在慢慢观察你的性格、相处节奏，需要时间慢慢攒喜欢。"},
+"E":{title:"故作镇定型 —— 嘴上说没有，身体很诚实",desc:"嘴硬选手本人！嘴上会否认、装淡定，但是眼神、小动作、下意识的照顾全都出卖TA。口是心非就是TA的心动暗号。"},
+"F":{title:"纯友谊型 —— TA真的只把你当朋友",desc:"TA很珍惜和你的相处，对你友善真诚，但只有朋友的好感，没有心动的喜欢。适合好好做朋友，往前一步反而尴尬。"},
+"G":{title:"暧昧拉扯型 —— 享受这个过程，就是不表态",desc:"TA很喜欢和你这种甜甜的暧昧氛围，享受被在意的感觉，但是暂时不想确定关系，不推进、不拒绝，喜欢慢慢拉扯。"},
+"H":{title:"礼貌友好型 —— TA对谁都这样，别多想",desc:"TA本身性格温柔体贴，待人友善，这些暖心举动是TA的习惯，不是专属你的偏爱。这份温柔是通用款，不是心动信号。"},
+"I":{title:"信号错位型 —— 你的心动，TA根本没接收到",desc:"你释放的好感、心动信号，TA完全没读懂，一直当成普通朋友相处。你们的心动频道没对上，对方get不到你的心意。"},
+"J":{title:"时机未到型 —— 有戏，但眼下不是时候",desc:"TA对你是有好感的，但是当下有别的顾虑（学业、状态、生活节奏等），暂时没办法开启恋爱。再等等，换个时间会不一样。"},
+};
+
+// 32道题目
+const questions = [
+    {q:"TA凌晨两点回你消息，你会怎么想",opts:[
+        {txt:"A：专门等我、心里惦记我",tag:"A"},
+        {txt:"B：大概率是忍不住想找我",tag:"B"},
+        {txt:"C：刚好熬夜，顺手回我",tag:"H"},
+        {txt:"D：刚好有空，顺便聊聊",tag:"D"},
+    ]},
+    {q:"你们聊天记录里，谁更常先结尾",opts:[
+        {txt:"A：互相轮流收尾，谁都舍不得断",tag:"A"},
+        {txt:"B：大多是TA主动收尾，还会找续话借口",tag:"B"},
+        {txt:"C：顺其自然，谁忙谁收尾",tag:"F"},
+        {txt:"D：故意不把话说完，留钩子",tag:"G"},
+    ]},
+    {q:"TA发朋友圈，你大概多久点赞",opts:[
+        {txt:"A：想点赞又犹豫半天",tag:"E"},
+        {txt:"B：隔一会儿，悄悄点赞不说话",tag:"B"},
+        {txt:"C：有空就点，经常互动",tag:"C"},
+        {txt:"D：刷到顺手点一下",tag:"H"},
+    ]},
+    {q:"TA约你吃饭，理由通常是哪种",opts:[
+        {txt:"A：“想和你单独吃顿饭”直白心动款",tag:"A"},
+        {txt:"B：“刚好路过，要不要一起”小心翼翼",tag:"B"},
+        {txt:"C：大家一群人一起聚餐",tag:"F"},
+        {txt:"D：“正好没人陪，问问你”试探邀约",tag:"D"},
+    ]},
+    {q:"和TA聊天，TA会不会主动开启新话题",opts:[
+        {txt:"A：聊完一个，马上抛出新话题",tag:"A"},
+        {txt:"B：找各种细碎小事来找你开启话题",tag:"B"},
+        {txt:"C：你抛话题，TA会延伸聊很久",tag:"C"},
+        {txt:"D：你说什么TA接什么，很少新开",tag:"H"},
+    ]},
+    {q:"在共同朋友面前，TA提起你的频率",opts:[
+        {txt:"A：经常主动提起，还会夸你",tag:"A"},
+        {txt:"B：悄悄提起，不敢太明显",tag:"B"},
+        {txt:"C：和提起其他朋友频率一样",tag:"F"},
+        {txt:"D：偶尔提到，不会多说",tag:"D"},
+    ]},
+    {q:"你发消息，TA一般多久回复",opts:[
+        {txt:"A：看到就回，不会晾很久",tag:"A"},
+        {txt:"B：忙完第一时间补消息，还会解释",tag:"B"},
+        {txt:"C：看到就礼貌回一句",tag:"H"},
+        {txt:"D：忽快忽慢，没有固定节奏",tag:"G"},
+    ]},
+    {q:"你们单独出门，TA会不会留意你的小喜好",opts:[
+        {txt:"A：牢牢记住，主动照顾你的喜好",tag:"A"},
+        {txt:"B：默默记着，悄悄给你小惊喜",tag:"B"},
+        {txt:"C：你说了之后，会放在心上",tag:"C"},
+        {txt:"D：客气照顾，对谁都这样",tag:"H"},
+    ]},
+    {q:"TA会不会主动给你分享日常碎片（晚霞、美食、路边小猫）",opts:[
+        {txt:"A：每天都主动分享，事事报备感",tag:"A"},
+        {txt:"B：攒到有意思的，才敢发给你",tag:"B"},
+        {txt:"C：看到好玩的，顺手分享给你",tag:"C"},
+        {txt:"D：间歇性分享，忽冷忽热",tag:"G"},
+    ]},
+    {q:"你开玩笑说喜欢TA，TA反应是？",opts:[
+        {txt:"A：顺势接住你的玩笑，反向撩你",tag:"A"},
+        {txt:"B：慌张害羞，转移话题但不拒绝",tag:"B"},
+        {txt:"C：跟着一起开玩笑，纯玩梗",tag:"F"},
+        {txt:"D：不正面回答，拉扯过去",tag:"G"},
+    ]},
+    {q:"吵架或者闹别扭之后，谁先低头",opts:[
+        {txt:"A：双方都会主动，舍不得冷战",tag:"A"},
+        {txt:"B：TA会悄悄找台阶，主动破冰",tag:"B"},
+        {txt:"C：谁错谁主动，没有特殊优待",tag:"F"},
+        {txt:"D：等情绪平复再沟通",tag:"D"},
+    ]},
+    {q:"TA会不会吃你和别人亲近的醋",opts:[
+        {txt:"A：直接表现出来，直白说在意",tag:"A"},
+        {txt:"B：默默不开心，情绪藏起来",tag:"B"},
+        {txt:"C：完全不吃醋，当成普通朋友",tag:"F"},
+        {txt:"D：偶尔吃醋，但不会表态",tag:"G"},
+    ]},
+    {q:"节日的时候，TA给你的祝福",opts:[
+        {txt:"A：专门编辑，独一份的祝福",tag:"A"},
+        {txt:"B：提前想好，悄悄发给你",tag:"B"},
+        {txt:"C：群发通用祝福模板",tag:"F"},
+        {txt:"D：简单走心，不花哨",tag:"D"},
+    ]},
+    {q:"你生病或者不开心的时候，TA会",opts:[
+        {txt:"A：主动关心，持续惦记你的状态",tag:"A"},
+        {txt:"B：小心翼翼来安慰你",tag:"B"},
+        {txt:"C：简单安慰，朋友式关心",tag:"F"},
+        {txt:"D：简单问候，保持距离",tag:"D"},
+    ]},
+    {q:"你们对视的时候，TA一般会",opts:[
+        {txt:"A：笑着和你对视，不躲开",tag:"A"},
+        {txt:"B：慌忙移开视线，有点害羞",tag:"B"},
+        {txt:"C：正常对视，和普通朋友一样",tag:"F"},
+        {txt:"D：强行淡定，假装不在意",tag:"E"},
+    ]},
+    {q:"TA会不会主动找借口单独见你",opts:[
+        {txt:"A：主动创造单独相处机会",tag:"A"},
+        {txt:"B：鼓起勇气，找理由约你",tag:"B"},
+        {txt:"C：见面大多是多人局",tag:"F"},
+        {txt:"D：可以单独见面，保持分寸",tag:"D"},
+    ]},
+    {q:"你发朋友圈，TA的互动方式",opts:[
+        {txt:"A：经常评论，和你互动聊天",tag:"A"},
+        {txt:"B：悄悄点赞，很少评论",tag:"B"},
+        {txt:"C：偶尔评论，轻松互动",tag:"C"},
+        {txt:"D：有时候点赞，有时候无视",tag:"G"},
+    ]},
+    {q:"TA会不会记住你随口提的小事",opts:[
+        {txt:"A：记得清清楚楚，后面主动提起",tag:"A"},
+        {txt:"B：默默记下，之后悄悄兑现",tag:"B"},
+        {txt:"C：听过就忘，很难记住",tag:"F"},
+        {txt:"D：印象很浅，需要提醒",tag:"D"},
+    ]},
+    {q:"聊天结束，TA会不会说期待下次聊",opts:[
+        {txt:"A：主动说，期待下次聊天",tag:"A"},
+        {txt:"B：含蓄表达，舍不得结束",tag:"B"},
+        {txt:"C：普通拜拜，没有额外期待",tag:"F"},
+        {txt:"D：留话头，引诱你继续聊",tag:"G"},
+    ]},
+    {q:"你们打闹开玩笑，TA的边界感",opts:[
+        {txt:"A：愿意和你亲近，不抗拒靠近",tag:"A"},
+        {txt:"B：有点害羞，但是不躲开",tag:"B"},
+        {txt:"C：和其他朋友打闹尺度一样",tag:"F"},
+        {txt:"D：保持温和距离，不越界",tag:"D"},
+    ]},
+    {q:"TA会不会向你打听你的感情状况",opts:[
+        {txt:"A：直接问，很在意你的感情",tag:"A"},
+        {txt:"B：旁敲侧击，悄悄打探",tag:"B"},
+        {txt:"C：完全不关心你的感情",tag:"F"},
+        {txt:"D：反复试探，不表明目的",tag:"G"},
+    ]},
+    {q:"你主动找TA，TA的第一反应",opts:[
+        {txt:"A：很开心，热情接话",tag:"A"},
+        {txt:"B：惊喜，有点慌乱",tag:"B"},
+        {txt:"C：正常回应，朋友模式",tag:"F"},
+        {txt:"D：平稳回应，不冷不热",tag:"D"},
+    ]},
+    {q:"一起出门，TA会不会下意识照顾你",opts:[
+        {txt:"A：下意识照顾，细节拉满",tag:"A"},
+        {txt:"B：小心翼翼照顾，怕被发现",tag:"B"},
+        {txt:"C：和照顾其他朋友一样",tag:"F"},
+        {txt:"D：出于礼貌的基础照顾",tag:"H"},
+    ]},
+    {q:"TA会不会和你分享自己的烦恼软肋",opts:[
+        {txt:"A：愿意跟你倾诉心里话",tag:"A"},
+        {txt:"B：只敢跟你说脆弱的一面",tag:"B"},
+        {txt:"C：只和好朋友说，不单独和你讲",tag:"F"},
+        {txt:"D：选择性倾诉，有所保留",tag:"D"},
+    ]},
+    {q:"别人起哄你们俩的时候，TA",opts:[
+        {txt:"A：不否认，甚至笑着接梗",tag:"A"},
+        {txt:"B：慌张害羞，不反驳",tag:"B"},
+        {txt:"C：跟着一起开玩笑，当玩笑",tag:"F"},
+        {txt:"D：不拒绝也不承认，拉扯",tag:"G"},
+    ]},
+    {q:"TA会不会主动给你发搞笑表情包/梗图",opts:[
+        {txt:"A：刷到好玩的，第一时间发给你",tag:"A"},
+        {txt:"B：攒很久，才敢发给你",tag:"B"},
+        {txt:"C：群发或者发给很多朋友",tag:"F"},
+        {txt:"D：时不时发，维持聊天感",tag:"G"},
+    ]},
+    {q:"约TA单独出门，TA的态度",opts:[
+        {txt:"A：爽快答应，还期待下次",tag:"A"},
+        {txt:"B：开心答应，有点紧张",tag:"B"},
+        {txt:"C：多人局才愿意出来",tag:"F"},
+        {txt:"D：看时间，谨慎答应",tag:"D"},
+    ]},
+    {q:"TA会不会记住你们之间专属小暗号、梗",opts:[
+        {txt:"A：记得，经常和你玩这个梗",tag:"A"},
+        {txt:"B：悄悄记住，很少主动提",tag:"B"},
+        {txt:"C：听过就忘，没放在心上",tag:"F"},
+        {txt:"D：有印象，需要提醒",tag:"D"},
+    ]},
+    {q:"深夜闲聊，TA会不会聊走心话题",opts:[
+        {txt:"A：愿意和你深夜走心谈心",tag:"A"},
+        {txt:"B：鼓起勇气说一点心里话",tag:"B"},
+        {txt:"C：只聊轻松搞笑话题，不走心",tag:"F"},
+        {txt:"D：聊两句走心，马上转回轻松",tag:"G"},
+    ]},
+    {q:"TA会不会主动制造偶遇",opts:[
+        {txt:"A：刻意制造机会，和你碰面",tag:"A"},
+        {txt:"B：悄悄蹲点，假装偶遇",tag:"B"},
+        {txt:"C：偶遇纯属巧合，没有刻意",tag:"F"},
+        {txt:"D：碰到了友好打招呼",tag:"D"},
+    ]},
+    {q:"你和TA吐槽烦心事，TA",opts:[
+        {txt:"A：认真倾听，帮你想办法",tag:"A"},
+        {txt:"B：耐心安抚，心疼你的情绪",tag:"B"},
+        {txt:"C：简单附和，朋友式安慰",tag:"F"},
+        {txt:"D：礼貌倾听，对谁都这样",tag:"H"},
+    ]},
+    {q:"如果很久没聊天，TA会",opts:[
+        {txt:"A：主动来找你，不想断联",tag:"A"},
+        {txt:"B：纠结很久，才来找你",tag:"B"},
+        {txt:"C：不主动，等你发起聊天",tag:"F"},
+        {txt:"D：等你来找TA",tag:"D"},
+    ]},
+];
+
+let currentQ = 0;
+let score = {A:0,B:0,C:0,D:0,E:0,F:0,G:0,H:0,I:0,J:0};
+
+// 页面切换
+function startTest(){
+    document.getElementById("page-home").classList.add("hidden");
+    document.getElementById("page-question").classList.remove("hidden");
+    showQuestion();
+}
+function showQuestion(){
+    const q = questions[currentQ];
+    document.getElementById("q-index").innerText = `第${currentQ+1}题 / 共32题`;
+    const per = Math.round(((currentQ)/questions.length)*100);
+    document.getElementById("q-progress").innerText = per+"%";
+    document.getElementById("progress-bar").style.width = per+"%";
+    document.getElementById("q-title").innerText = q.q;
+    let optHtml = "";
+    q.opts.forEach(opt=>{
+        optHtml += `<div onclick="selectOption('${opt.tag}')" class="option-item p-4 border border-pink-100 rounded-xl cursor-pointer hover:bg-pink-50">${opt.txt}</div>`
+    })
+    document.getElementById("option-box").innerHTML = optHtml;
+}
+function selectOption(tag){
+    score[tag]++;
+    currentQ++;
+    if(currentQ >= questions.length){
+        showResult();
+    }else{
+        showQuestion();
+    }
+}
+function showResult(){
+    document.getElementById("page-question").classList.add("hidden");
+    document.getElementById("page-result").classList.remove("hidden");
+    // 获取最高分标签
+    let maxTag = "A";
+    let maxVal = 0;
+    for(let k in score){
+        if(score[k]>maxVal){
+            maxVal = score[k];
+            maxTag = k;
+        }
+    }
+    const res = resultData[maxTag];
+    document.getElementById("result-title").innerText = res.title;
+    document.getElementById("result-desc").innerText = res.desc;
+}
+function restart(){
+    currentQ = 0;
+    score = {A:0,B:0,C:0,D:0,E:0,F:0,G:0,H:0,I:0,J:0};
+    document.getElementById("page-result").classList.add("hidden");
+    document.getElementById("page-home").classList.remove("block");
+    document.getElementById("page-home").classList.add("block");
+}
+</script>
+</body>
+</html>
